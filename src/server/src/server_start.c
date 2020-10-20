@@ -158,6 +158,7 @@ static void *serve(void *args)
     ssl = SSL_new(ctx);
     SSL_set_fd(ssl, new_socket);
 
+    LOG_DEBUG("Waiting for client...\n");
     if (SSL_accept(ssl) <= 0)
     {
         ERR_print_errors_fp(stderr);
@@ -167,12 +168,11 @@ static void *serve(void *args)
         SSL_write(ssl, hello, strlen(hello));
     }
 
+    LOG_DEBUG("Reading...\n");
     valread = SSL_read(ssl, buffer, 1024);
-    // valread = read(new_socket, buffer, 1024);
-    // LOG_INFO("%s\n", buffer);
-    // send(new_socket, hello, strlen(hello), 0);
-    // SSL_write(ssl, hello, strlen(hello));
-    // LOG_INFO("Hello message sent\n");
+    LOG_INFO("Read %s\n", buffer);
+    SSL_write(ssl, hello, strlen(hello));
+    LOG_INFO("Hello message sent\n");
 
     SSL_shutdown(ssl);
     SSL_free(ssl);
@@ -208,6 +208,8 @@ pthread_t *server_start(unsigned short port)
     semaphore_init(&gSem, 0);
 
     pthread_create(thread_id, NULL, serve, &serverArgs);
+
+    LOG_INFO("Waiting for server to start...\n");
 
     /* wait for the server to start up... */
     semaphore_wait(&gSem);
