@@ -33,21 +33,38 @@
 /* semaphore for waiting until server has started. */
 semaphore_t gSem;
 
-void init_openssl()
+/* cert files */
+static char gCertFilename[] = "cert.pem";
+static char gKeyFilename[]  = "key.pem";
+
+/**
+ * @brief Initialize the openSSL library.
+ *
+ */
+static void init_openssl()
 {
     SSL_load_error_strings();
     OpenSSL_add_ssl_algorithms();
 }
 
-void cleanup_openssl()
+/**
+ * @brief Cleanup the openSSL library.
+ *
+ */
+static void cleanup_openssl()
 {
     EVP_cleanup();
 }
 
+/**
+ * @brief Create openSSL context.
+ *
+ * @return SSL_CTX* new context.
+ */
 SSL_CTX *create_context()
 {
-    const SSL_METHOD *method;
-    SSL_CTX *         ctx;
+    const SSL_METHOD *method = NULL;
+    SSL_CTX *         ctx    = NULL;
 
     method = SSLv23_server_method();
 
@@ -62,18 +79,27 @@ SSL_CTX *create_context()
     return ctx;
 }
 
-void configure_context(SSL_CTX *ctx)
+/**
+ * @brief Configure an SSL context.
+ *
+ * @param ctx to configure.
+ * @param certFilename path to the certificate PEM file.
+ * @param keyFilename path to the key PEM file.
+ */
+static void configure_context(SSL_CTX *ctx,
+                              char *   certFilename,
+                              char *   keyFilename)
 {
     SSL_CTX_set_ecdh_auto(ctx, 1);
 
     /* Set the key and cert */
-    if (SSL_CTX_use_certificate_file(ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0)
+    if (SSL_CTX_use_certificate_file(ctx, certFilename, SSL_FILETYPE_PEM) <= 0)
     {
         ERR_print_errors_fp(stderr);
         exit(EXIT_FAILURE);
     }
 
-    if (SSL_CTX_use_PrivateKey_file(ctx, "key.pem", SSL_FILETYPE_PEM) <= 0)
+    if (SSL_CTX_use_PrivateKey_file(ctx, keyFilename, SSL_FILETYPE_PEM) <= 0)
     {
         ERR_print_errors_fp(stderr);
         exit(EXIT_FAILURE);
@@ -101,16 +127,16 @@ static void *serve(void *args)
     init_openssl();
     ctx = create_context();
 
-    configure_context(ctx);
+    configure_context(ctx, gCertFilename, gKeyFilename);
 
-    // Creating socket file descriptor
+    /* Creating socket file descriptor */
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
 
-    // Forcefully attaching socket to the port 8080
+    /* Forcefully attaching socket to the port 8080 */
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     {
         perror("setsockopt");
@@ -176,7 +202,6 @@ static void *serve(void *args)
 
     SSL_shutdown(ssl);
     SSL_free(ssl);
-
     SSL_CTX_free(ctx);
     cleanup_openssl();
 
