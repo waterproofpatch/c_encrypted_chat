@@ -43,7 +43,8 @@ int main(int argc, char const *argv[])
     ssl = client_start("127.0.0.1", 8080);
     assert(ssl != NULL);
     assert(client_sendMsg(ssl, "Hey!", strlen("Hey!")) > 0);
-    assert(client_readMsg(ssl, buffer, sizeof(*buffer)) > 0);
+    assert(client_readMsg(ssl, buffer, sizeof(buffer)) > 0);
+    LOG_INFO("Client read: %s\n", buffer);
 
     LOG_INFO("waiting for server to finish...\n");
     pthread_join(*serverThread, NULL);

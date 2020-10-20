@@ -36,5 +36,5 @@ int main(int argc, char const *argv[])
     }
     assert(client_sendMsg(ssl, hello, strlen(hello)) == 0);
     assert(client_readMsg(ssl, buffer, 1024) == 0);
-    LOG_INFO("%s\n", buffer);
+    LOG_INFO("Read: %s\n", buffer);
 }

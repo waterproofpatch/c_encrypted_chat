@@ -34,6 +34,6 @@ int client_readMsg(SSL *ssl, char *msg, size_t msgLen)
     int ret = 0;
     LOG_DEBUG("Reading message length %ld\n", msgLen);
     ret = SSL_read(ssl, msg, msgLen);
-    LOG_DEBUG("Message read.\n");
+    LOG_DEBUG("Message read\n");
     return ret;
 }

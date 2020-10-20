@@ -196,7 +196,7 @@ static void *serve(void *args)
 
     LOG_DEBUG("Reading...\n");
     valread = SSL_read(ssl, buffer, 1024);
-    LOG_INFO("Read %s\n", buffer);
+    LOG_INFO("Read: %s\n", buffer);
     SSL_write(ssl, hello, strlen(hello));
     LOG_INFO("Hello message sent\n");
 
