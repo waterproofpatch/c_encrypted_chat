@@ -61,6 +61,11 @@ server_main: dirs server
 main: dirs server client
 	$(CC) $(FLAGS) $(ROOT_MAIN_INCLUDES) -L$(LIB_DIR)/server -L$(LIB_DIR)/client -lserver -lclient $(SRC_DIR)/main.c -o $(BIN_DIR)/main
 
+# Generate key and sign new certificate with it.
+certs:
+	openssl req -new -newkey rsa:4096 -nodes -keyout key.pem -out cert.csr
+	openssl x509 -req -sha256 -days 365 -in cert.csr -signkey key.pem -out cert.pem
+
 # Documentation.
 docs:
 	doxygen
