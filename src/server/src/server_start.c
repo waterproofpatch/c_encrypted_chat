@@ -95,8 +95,8 @@ static void *serve(void *args)
     char               buffer[1024] = {0};
     char *             hello        = "Hello from server";
 
-    SSL_CTX *ctx;
-    SSL *    ssl;
+    SSL_CTX *ctx = NULL;
+    SSL *    ssl = NULL;
 
     init_openssl();
     ctx = create_context();
@@ -167,6 +167,7 @@ static void *serve(void *args)
         SSL_write(ssl, hello, strlen(hello));
     }
 
+    valread = SSL_read(ssl, buffer, 1024);
     // valread = read(new_socket, buffer, 1024);
     // LOG_INFO("%s\n", buffer);
     // send(new_socket, hello, strlen(hello), 0);
