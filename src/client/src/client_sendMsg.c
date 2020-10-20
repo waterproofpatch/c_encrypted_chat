@@ -13,6 +13,9 @@
 #include <stdio.h>
 #include <sys/socket.h>
 
+/* installed includes */
+#include <openssl/ssl.h>
+
 /* custom includes */
 #include "client_sendMsg.h"
 #include "logger.h"
@@ -26,11 +29,11 @@
  * @return number of bytes sent on success.
  * @return -1 on failure.
  */
-int client_sendMsg(int sock, char *msg, size_t msgLen)
+int client_sendMsg(SSL *ssl, char *msg, size_t msgLen)
 {
     int ret = 0;
     LOG_DEBUG("Sending message length %ld: %s\n", msgLen, msg);
-    ret = send(sock, msg, msgLen, 0);
+    ret = SSL_write(ssl, msg, msgLen);
     LOG_DEBUG("Message sent.\n");
     return ret;
 }

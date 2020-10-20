@@ -14,6 +14,9 @@
 #include <assert.h>
 #include <string.h>
 
+/* installed includes */
+#include <openssl/ssl.h>
+
 #include "client_start.h"
 #include "client_readMsg.h"
 #include "client_sendMsg.h"
@@ -25,13 +28,13 @@ int main(int argc, char const *argv[])
     char  buffer[1024] = {0};
 
     LOG_INFO("Starting client\n");
-    int sock = client_start("127.0.0.1", 8080);
-    if (sock == 0)
+    SSL *ssl = client_start("127.0.0.1", 8080);
+    if (ssl == NULL)
     {
         LOG_ERROR("Failed getting socket.\n");
         return 1;
     }
-    assert(client_sendMsg(sock, hello, strlen(hello)) == 0);
-    assert(client_readMsg(sock, buffer, 1024) == 0);
+    assert(client_sendMsg(ssl, hello, strlen(hello)) == 0);
+    assert(client_readMsg(ssl, buffer, 1024) == 0);
     LOG_INFO("%s\n", buffer);
 }

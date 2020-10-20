@@ -13,6 +13,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
+/* installed includes */
+#include <openssl/ssl.h>
+
 /* custom includes */
 #include "client_readMsg.h"
 #include "logger.h"
@@ -26,11 +29,11 @@
  * @return number of bytes read on success.
  * @return -1 on failure.
  */
-int client_readMsg(int sock, char *msg, size_t msgLen)
+int client_readMsg(SSL *ssl, char *msg, size_t msgLen)
 {
     int ret = 0;
     LOG_DEBUG("Reading message length %ld\n", msgLen);
-    ret = read(sock, msg, msgLen);
+    ret = SSL_read(ssl, msg, msgLen);
     LOG_DEBUG("Message read.\n");
     return ret;
 }

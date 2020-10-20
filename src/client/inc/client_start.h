@@ -12,6 +12,9 @@
 #ifndef _CLIENT_START_H_
 #define _CLIENT_START_H_
 
-int client_start(char *hostname, unsigned short port);
+/* installed includes */
+#include <openssl/ssl.h>
+
+SSL *client_start(char *hostname, unsigned short port);
 
 #endif

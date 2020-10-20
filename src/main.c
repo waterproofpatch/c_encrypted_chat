@@ -17,6 +17,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+/* installed includes */
+#include <openssl/ssl.h>
+
 /* custom includes */
 #include "server_start.h"
 #include "client_start.h"
@@ -28,7 +31,7 @@ int main(int argc, char const *argv[])
 {
     pthread_t *serverThread = server_start(8080);
     char       buffer[1024];
-    int        sock = -1;
+    SSL *      ssl = NULL;
 
     if (!serverThread)
     {
@@ -37,10 +40,10 @@ int main(int argc, char const *argv[])
     }
 
     LOG_INFO("Starting client\n");
-    sock = client_start("127.0.0.1", 8080);
-    assert(sock > 0);
-    assert(client_sendMsg(sock, "Hey!", strlen("Hey!")) > 0);
-    assert(client_readMsg(sock, buffer, sizeof(*buffer)) > 0);
+    ssl = client_start("127.0.0.1", 8080);
+    assert(ssl != NULL);
+    assert(client_sendMsg(ssl, "Hey!", strlen("Hey!")) > 0);
+    assert(client_readMsg(ssl, buffer, sizeof(*buffer)) > 0);
 
     LOG_INFO("waiting for server to finish...\n");
     pthread_join(*serverThread, NULL);

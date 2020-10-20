@@ -15,6 +15,9 @@
 /* system includes */
 #include <stddef.h>
 
-int client_readMsg(int sock, char *msg, size_t msgLen);
+/* installed includes */
+#include <openssl/ssl.h>
+
+int client_readMsg(SSL *ssl, char *msg, size_t msgLen);
 
 #endif
