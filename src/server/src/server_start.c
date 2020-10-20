@@ -95,6 +95,14 @@ static void *serve(void *args)
     char               buffer[1024] = {0};
     char *             hello        = "Hello from server";
 
+    SSL_CTX *ctx;
+    SSL *    ssl;
+
+    init_openssl();
+    ctx = create_context();
+
+    configure_context(ctx);
+
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -147,10 +155,29 @@ static void *serve(void *args)
         exit(EXIT_FAILURE);
     }
 
-    valread = read(new_socket, buffer, 1024);
-    LOG_INFO("%s\n", buffer);
-    send(new_socket, hello, strlen(hello), 0);
-    LOG_INFO("Hello message sent\n");
+    ssl = SSL_new(ctx);
+    SSL_set_fd(ssl, new_socket);
+
+    if (SSL_accept(ssl) <= 0)
+    {
+        ERR_print_errors_fp(stderr);
+    }
+    else
+    {
+        SSL_write(ssl, hello, strlen(hello));
+    }
+
+    // valread = read(new_socket, buffer, 1024);
+    // LOG_INFO("%s\n", buffer);
+    // send(new_socket, hello, strlen(hello), 0);
+    // SSL_write(ssl, hello, strlen(hello));
+    // LOG_INFO("Hello message sent\n");
+
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+
+    SSL_CTX_free(ctx);
+    cleanup_openssl();
 
     return NULL;
 }
